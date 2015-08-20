@@ -27,12 +27,12 @@ done
 
 #参考带宽=基础带宽+总增量包数-5
 BW_total=$(($BPW_total+$BaseBandwidth-5))
-
+echo $BW_total >> BW.txt
 #判断最近5次流量是否大于参考量
 if [ ${BW[0]} -ge $BW_total -a ${BW[1]} -ge $BW_total -a ${BW[2]} -ge $BW_total -a ${BW[3]} -ge $BW_total -a ${BW[4]} -ge $BW_total ];then
     echo 'bad' >> BW.txt
     result=$($(dirname $0)/Create_BandwidthPackage.sh | jq .RetCode | sed 's/"//g')
-   [ $result = 0 ] && echo '购买成功' || echo '购买失败'
+   [ $result = 0 ] && echo '购买成功' >> BW.txt || echo '购买失败' >> BW.txt
 else
     echo 'good' >> BW.txt
 fi
