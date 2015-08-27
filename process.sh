@@ -15,19 +15,32 @@ done
 
 #算总增量包数
 Bpackagenum=$($(dirname $0)/describe_bandwidthpackage.sh  | jq .TotalCount)
-BaseBandwidth=$($(dirname $0)/describe_eip.sh | jq .EIPSet[1].Bandwidth)
+echo "Bpackagenum:"$Bpackagenum >> BW.txt
 for ((i=0;i<${Bpackagenum};i++))
 do
 	eipid=$($(dirname $0)/describe_bandwidthpackage.sh  | jq .DataSets[$i].EIPId | sed 's/"//g')
-    if [ "$eipid" = "eip-ucdn2z" ];then
+    echo "eipid:"$eipid >> BW.txt
+	if [ "$eipid" = "eip-ucdn2z" ];then
+		echo "BPW_total:"$BPW_total >> BW.txt
 		Bpackagewidth=$($(dirname $0)/describe_bandwidthpackage.sh  | jq .DataSets[$i].Bandwidth)
+		echo "Bpackagewidth:"$Bpackagewidth >> BW.txt
 		BPW_total=$(($BPW_total+$Bpackagewidth))
 	fi
 done
 
+BaseBandwidth="null"
+while [ $BaseBandwidth = "null" ]
+do
+	sleep 10
+	BaseBandwidth=$($(dirname $0)/describe_eip.sh | jq .EIPSet[1].Bandwidth)
+	echo "BaseBandwidth:"$BaseBandwidth >> BW.txt
+done
+
 #参考带宽=基础带宽+总增量包数-5
+echo "BPW_total:"$BPW_total >> BW.txt
 BW_total=$(($BPW_total+$BaseBandwidth-5))
-echo $BW_total >> BW.txt
+echo "Bandwidth now: "$BW_total"Mb" >> BW.txt
+
 #判断最近5次流量是否大于参考量
 if [ ${BW[0]} -ge $BW_total -a ${BW[1]} -ge $BW_total -a ${BW[2]} -ge $BW_total -a ${BW[3]} -ge $BW_total -a ${BW[4]} -ge $BW_total ];then
     echo 'bad' >> BW.txt
