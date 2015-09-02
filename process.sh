@@ -36,9 +36,10 @@ do
 	echo "BaseBandwidth:"$BaseBandwidth >> BW.txt
 done
 
-#参考带宽=基础带宽+总增量包数-5
+#参考带宽=基础带宽+总增量包数-offset
 echo "BPW_total:"$BPW_total >> BW.txt
-BW_total=$(($BPW_total+$BaseBandwidth-5))
+offset=0
+BW_total=$(($BPW_total+$BaseBandwidth-$offset))
 echo "Bandwidth now: "$BW_total"Mb" >> BW.txt
 
 #判断最近5次流量是否大于参考量
