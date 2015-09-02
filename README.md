@@ -1,11 +1,4 @@
-# ucloud-api
-本脚本是根据ucloud官方api所编写，处理过程参照官方[python-sdk](https://github.com/ucloud-web/python-sdk-v2)。
-
-每个功能模块对应其命名的shell脚本。
-
-输出结果以json返回。
-
-#ucloud带宽自动调度机制:
+# ucloud带宽自动调度机制:
 
 目的：把原本根据监控报警后手动购买带宽包变为自动；凌晨项目基本不使用，此时可以自动地把带宽降低到一定的值（10M），节省开支；在客户上班前把带宽自动提升到基准值，整个升降带宽过程对客户是透明的。
 
@@ -27,39 +20,39 @@
 	public_key=ucloud账户公钥
 	private_key=ucloud账户私钥
 
-#token模块	
+### token模块	
 
     core.sh
 
-#带宽增加模块
+### 带宽增加模块
 
     Create_BandwidthPackage.sh
 
-#获取带宽包模块
+### 获取带宽包模块
     
     describe_bandwidthpackage.sh
     
-#获取EIP信息模块
+### 获取EIP信息模块
 
     describe_eip.sh
 
-#获取ULB信息模块
+### 获取ULB信息模块
 
     describe_ulb.sh
 
-#获取最近一小时内每150秒流量
+### 获取最近一小时内每150秒流量
 
     get_metric.sh
 
-#离线流量，10M
+### 离线流量，10M
 
     modify_eipbandwidth_offline.sh
 
-#在线流量，50M
+### 在线流量，50M
 
     modify_eipbandwidth_online.sh
 
-#流量处理模块
+### 流量处理模块
 
     process.sh
 
