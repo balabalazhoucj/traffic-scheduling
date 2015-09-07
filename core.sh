@@ -1,7 +1,9 @@
 #!/bin/sh
-#[ -f base.sh ] || echo "请先在同层目录新建一个base.sh文件，用于存放密钥"
-
-. $(dirname $0)/base.sh
+if [ -f base.sh ];then
+	. $(dirname $0)/base.sh
+else
+	echo "请先在同层目录新建一个base.sh文件，用于存放密钥"
+fi
 
 #signature string
 signlist=$(echo $oldlist" PublicKey=$public_key"|sed 's/ /\n/g;s/=//g'| sort -k1 | awk -vFS='\n' -vORS='' '$1=$1')$private_key
