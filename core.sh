@@ -1,5 +1,5 @@
 #!/bin/sh
-if [ -f base.sh ];then
+if [ -f $(dirname $0)/base.sh ];then
 	. $(dirname $0)/base.sh
 else
 	echo "请先在同层目录新建一个base.sh文件，用于存放密钥"
