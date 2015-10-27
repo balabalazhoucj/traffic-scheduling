@@ -1,11 +1,10 @@
 #!/bin/sh
+. /etc/init.d/functions
+
 echo "----------$(date)------------------" >> BW.txt
 
 Basepackage() 
 {
-	#算总增量包数
-	Bpackagenum=$($(dirname $0)/describe_bandwidthpackage.sh  | jq .TotalCount)
-	[ $Bpackagenum = 0 ] && return
 	for ((i=0;i<${Bpackagenum};i++))
 	do
 		eipid=$($(dirname $0)/describe_bandwidthpackage.sh  | jq .DataSets[$i].EIPId | sed 's/"//g')
@@ -22,12 +21,16 @@ Basepackage()
 #最近n次流量
 n=5
 count=0
-offset=0
+offset=2
 BW=($($(dirname $0)/get_metric.sh |jq '.DataSets.NetworkOut[].Value' | tail -$n | awk '{printf "%d\n",$1/1024/1024}'))
 echo ${BW[@]}
 #echo $(date +%T --date="@$Time")
 
-Basepackage
+#算总增量包数
+Bpackagenum=$($(dirname $0)/describe_bandwidthpackage.sh  | jq .TotalCount)
+if [[ $Bpackagenum != 0 ]];then
+	Basepackage
+fi
 
 BaseBandwidth="null"
 while [ $BaseBandwidth = "null" ]
@@ -45,7 +48,7 @@ echo "Bandwidth now: "$BW_total"Mb" >> BW.txt
 #判断最近5次流量是否大于参考量
 for ((i=0;i<$n;i++))
 do
-	[ ${BW[$i]} -ge $BW_total ] && (( count++ ))
+	[[ ${BW[$i]} -ge $BW_total ]] && (( count++ ))
 done
 	
 if [ $count = $n ];then
