@@ -8,22 +8,22 @@ Basepackage()
 	for ((i=0;i<${Bpackagenum};i++))
 	do
 		eipid=$($(dirname $0)/describe_bandwidthpackage.sh  | jq .DataSets[$i].EIPId | sed 's/"//g')
-		echo "eipid:"$eipid >> BW.txt
+		#echo "eipid:"$eipid >> BW.txt
 		if [ "$eipid" = "eip-ucdn2z" ];then
-			echo "BPW_total:"$BPW_total >> BW.txt
 			Bpackagewidth=$($(dirname $0)/describe_bandwidthpackage.sh  | jq .DataSets[$i].Bandwidth)
-			echo "Bpackagewidth:"$Bpackagewidth >> BW.txt
+			echo "当前带宽包[${i}]: ${Bpackagewidth}Mb" >> BW.txt
 			BPW_total=$(($BPW_total+$Bpackagewidth))
 		fi
 	done
+	echo "带宽包总计: ${BPW_total}Mb" >> BW.txt
 }
 
 #最近n次流量
 n=5
 count=0
-offset=2
-BW=($($(dirname $0)/get_metric.sh |jq '.DataSets.NetworkOut[].Value' | tail -$n | awk '{printf "%d\n",$1/1024/1024}'))
-echo ${BW[@]}
+offset=3
+BW=($($(dirname $0)/get_metric.sh |jq '.DataSets.NetworkOut[].Value' | tail -$n | awk '{printf "%d\n",$1/1000/1000}'))
+echo ${BW[@]} >> BW.txt
 #echo $(date +%T --date="@$Time")
 
 #算总增量包数
@@ -37,13 +37,12 @@ while [ $BaseBandwidth = "null" ]
 do
 	sleep 5
 	BaseBandwidth=$($(dirname $0)/describe_eip.sh | jq .EIPSet[1].Bandwidth)
-	echo "BaseBandwidth:"$BaseBandwidth >> BW.txt
+	echo "默认带宽: ${BaseBandwidth}Mb" >> BW.txt
 done
 
 #参考带宽=基础带宽+总增量包数-offset
-echo "BPW_total:"$BPW_total >> BW.txt
 BW_total=$(($BPW_total+$BaseBandwidth-$offset))
-echo "Bandwidth now: "$BW_total"Mb" >> BW.txt
+echo "当前带宽阀值: ${BW_total}Mb" >> BW.txt
 
 #判断最近5次流量是否大于参考量
 for ((i=0;i<$n;i++))
@@ -52,10 +51,10 @@ do
 done
 	
 if [ $count = $n ];then
-    echo 'bad' >> BW.txt
+    echo '正在努力购买带宽。。。。。' >> BW.txt
     result=$($(dirname $0)/Create_BandwidthPackage.sh | jq .RetCode | sed 's/"//g')
-   [ $result = 0 ] && echo '购买成功' >> BW.txt || echo '购买失败' >> BW.txt
+   [ $result = 0 ] && echo '带宽包购买成功' >> BW.txt || echo '带宽包购买失败' >> BW.txt
 else
-    echo 'good' >> BW.txt
+    echo '带宽在合理范围内' >> BW.txt
 fi
 
