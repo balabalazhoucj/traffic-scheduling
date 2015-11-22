@@ -22,8 +22,13 @@ Basepackage()
 n=5
 count=0
 offset=3
-BW=($($(dirname $0)/get_metric.sh |jq '.DataSets.NetworkOut[].Value' | tail -$n | awk '{printf "%d\n",$1/1000/1000}'))
-echo ${BW[@]} >> BW.txt
+BW=($($(dirname $0)/get_metric.sh |jq '.DataSets.NetworkOut[].Value' | tail -$n | awk '{printf "%7-d",$1/1000/1000}'))
+$(dirname $0)/get_metric.sh |jq '.DataSets.NetworkOut[].Timestamp' | tail -5 | awk '{printf "%s ",strftime("%H:%M:%S",$1)}' >> BW.txt
+echo >>BW.txt
+$(dirname $0)/get_metric.sh |jq '.DataSets.NetworkOut[].Value' | tail -$n | awk '{printf "%9-d",$1/1000/1000}' >> BW.txt
+echo >> BW.txt
+#echo ${TIMES[@]} >> BW.txt
+#echo ${BW[@]} >> BW.txt
 #echo $(date +%T --date="@$Time")
 
 #算总增量包数
